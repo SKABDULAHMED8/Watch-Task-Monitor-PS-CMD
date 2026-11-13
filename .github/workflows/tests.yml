@@ -1,0 +1,65 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tests in Windows PowerShell 5.1
+        shell: powershell
+        run: .\tests\run-tests.ps1
+
+      - name: Tests in PowerShell 7
+        shell: pwsh
+        run: .\tests\run-tests.ps1
+
+      - name: Install, use, repair and remove (real PATH on the runner)
+        shell: powershell
+        run: |
+          function Refresh-Path {
+            $u = [Environment]::ExpandEnvironmentVariables([Environment]::GetEnvironmentVariable('Path', 'User'))
+            $env:Path = $env:Path + ';' + $u
+          }
+          function Fail($m) { Write-Host "FAILED: $m"; exit 1 }
+
+          cmd /d /c "install.cmd"
+          if ($LASTEXITCODE -ne 0) { Fail 'install.cmd' }
+          Refresh-Path
+
+          cmd /d /c "watch --version"
+          if ($LASTEXITCODE -ne 0) { Fail 'watch --version' }
+          cmd /d /c "watch exit /b 9"
+          if ($LASTEXITCODE -ne 9) { Fail "exit code was $LASTEXITCODE, not 9" }
+          cmd /d /c "watch --ps ""Get-Date"""
+          if ($LASTEXITCODE -ne 0) { Fail 'watch --ps' }
+          if (-not (Test-Path "$env:LOCALAPPDATA\WatchTaskMonitor\logs\commands.log")) { Fail 'log file' }
+
+          $second = cmd /d /c "install.cmd" | Out-String
+          if ($second -notmatch 'already installed') { Fail 'second install did not say already installed' }
+
+          cmd /d /c "install.cmd repair"
+          if ($LASTEXITCODE -ne 0) { Fail 'repair' }
+
+          cmd /d /c "watch-uninstall"
+          if ($LASTEXITCODE -ne 0) { Fail 'watch-uninstall' }
+          if (Test-Path "$env:LOCALAPPDATA\WatchTaskMonitor\watch.cmd") { Fail 'watch.cmd is still there' }
+          $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+          if ($userPath -match 'WatchTaskMonitor') { Fail 'PATH entry is still there' }
+          Write-Host 'Install smoke test passed.'
+
+      - name: One-line install from GitHub
+        if: github.ref == 'refs/heads/main'
+        shell: powershell
+        run: |
+          curl.exe -fsSL https://raw.githubusercontent.com/SKABDULAHMED8/Watch-Task-Monitor-PS-CMD/main/install.cmd -o "$env:TEMP\wtm-install.cmd"
+          if ($LASTEXITCODE -ne 0) { Write-Host 'download failed'; exit 1 }
+          cmd /d /c """$env:TEMP\wtm-install.cmd"""
+          if ($LASTEXITCODE -ne 0) { Write-Host 'one-line install failed'; exit 1 }
+          if (-not (Test-Path "$env:LOCALAPPDATA\WatchTaskMonitor\watch.cmd")) { Write-Host 'watch.cmd missing'; exit 1 }
+          Write-Host 'One-line install passed.'
