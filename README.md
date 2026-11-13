@@ -1,4 +1,19 @@
-# Watch Task Monitor
+<p align="center">
+  <img src="assets/logo.png" alt="Watch Task Monitor logo" width="360">
+</p>
+
+<h1 align="center">Watch Task Monitor</h1>
+
+<p align="center">Time, status and exit code for CMD and PowerShell commands.</p>
+
+<p align="center">
+  <a href="https://github.com/SKABDULAHMED8/Watch-Task-Monitor-PS-CMD/actions/workflows/tests.yml"><img src="https://github.com/SKABDULAHMED8/Watch-Task-Monitor-PS-CMD/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT licence"></a>
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?logo=windows" alt="Windows 10 and 11">
+  <img src="https://img.shields.io/badge/PowerShell-5.1%20%7C%207-5391FE?logo=powershell&logoColor=white" alt="PowerShell 5.1 and 7">
+</p>
+
+---
 
 Watch Task Monitor runs a command in CMD or PowerShell. It shows the time the command took, the exit code and the result. It also writes one line to a log file.
 
