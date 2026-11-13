@@ -49,7 +49,10 @@ function Invoke-Watch {
 
 function Get-LogLines($home_) {
     $log = Join-Path $home_ 'logs\commands.log'
-    if (Test-Path -LiteralPath $log) { @(Get-Content -LiteralPath $log -Encoding UTF8) } else { @() }
+    $lines = @()
+    if (Test-Path -LiteralPath $log) { $lines = @(Get-Content -LiteralPath $log -Encoding UTF8) }
+    # The comma keeps a one-line log as an array. Without it, [0] would return the first letter.
+    return , $lines
 }
 
 function Invoke-Installer {
