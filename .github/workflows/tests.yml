@@ -51,6 +51,13 @@ jobs:
           if (Test-Path "$env:LOCALAPPDATA\WatchTaskMonitor\watch.cmd") { Fail 'watch.cmd is still there' }
           $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
           if ($userPath -match 'WatchTaskMonitor') { Fail 'PATH entry is still there' }
+          # Install again, then remove everything including the logs.
+          cmd /d /c "install.cmd"
+          if ($LASTEXITCODE -ne 0) { Fail 'second fresh install' }
+          cmd /d /c "watch echo log-check"
+          cmd /d /c "watch-uninstall /logs"
+          if ($LASTEXITCODE -ne 0) { Fail 'watch-uninstall /logs' }
+          if (Test-Path "$env:LOCALAPPDATA\WatchTaskMonitor") { Fail 'data folder is still there after /logs' }
           Write-Host 'Install smoke test passed.'
 
       - name: One-line install from GitHub

@@ -194,6 +194,10 @@ try {
                     Write-Host 'To remove them too, run: watch-uninstall /logs'
                 }
             }
+            # watch-uninstall runs this script from a copy in the TEMP folder. Delete that copy.
+            if ($PSCommandPath -and ((Split-Path -Leaf $PSCommandPath) -like 'wtm-uninstall-*.ps1')) {
+                try { Remove-Item -LiteralPath $PSCommandPath -Force } catch { }
+            }
         }
     }
     exit 0
