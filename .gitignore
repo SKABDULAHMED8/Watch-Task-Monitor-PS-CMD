@@ -3,3 +3,18 @@
 .vscode/
 .idea/
 Thumbs.db
+
+# --- Security: never commit secrets or signing material ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+keystore.properties
+secrets.*
+credentials*.json
+id_rsa*
